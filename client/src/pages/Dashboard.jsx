@@ -46,6 +46,20 @@ const Dashboard = () => {
     }
   };
 
+  const handleCancelAppointment = async (id) => {
+    if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
+    
+    try {
+      await api.patch(`/appointments/${id}/cancel`);
+      toast.success('Appointment cancelled successfully');
+      setAppointments(appointments.map(a => 
+        a._id === id ? { ...a, status: 'cancelled' } : a
+      ));
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to cancel appointment');
+    }
+  };
+
   const upcomingAppts = appointments.filter(a => ['pending', 'approved'].includes(a.status) && new Date(a.date) >= new Date(new Date().setHours(0,0,0,0)));
   const pastAppts = appointments.filter(a => ['completed', 'cancelled'].includes(a.status) || new Date(a.date) < new Date(new Date().setHours(0,0,0,0)));
 
@@ -178,15 +192,24 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="w-full sm:w-auto flex justify-end">
+                      <div className="w-full sm:w-auto flex justify-end items-center space-x-3">
                         {appt.status === 'approved' ? (
                           <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                             <CheckCircle className="w-4 h-4 mr-1" /> Approved
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                            <Clock3 className="w-4 h-4 mr-1" /> Pending
-                          </span>
+                          <>
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                              <Clock3 className="w-4 h-4 mr-1" /> Pending
+                            </span>
+                            <button
+                              onClick={() => handleCancelAppointment(appt._id)}
+                              className="inline-flex items-center p-1.5 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-lg transition-colors"
+                              title="Cancel Appointment"
+                            >
+                              <XCircle className="w-5 h-5" />
+                            </button>
+                          </>
                         )}
                       </div>
                     </div>

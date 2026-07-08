@@ -147,3 +147,50 @@ export const updateAppointmentStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Cancel an appointment (Patient)
+// @route   PATCH /api/appointments/:id/cancel
+// @access  Private (Patient)
+export const cancelPatientAppointment = async (req, res, next) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id)
+      .populate('doctorId');
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // Verify the appointment belongs to the logged in patient
+    if (appointment.patientId.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to cancel this appointment' });
+    }
+
+    // Only allow cancelling if it's pending
+    if (appointment.status !== 'pending') {
+      return res.status(400).json({ message: `Cannot cancel an appointment with status: ${appointment.status}` });
+    }
+
+    appointment.status = 'cancelled';
+    await appointment.save();
+
+    // Send Email Notification to Patient (Optional, but good UX)
+    try {
+      const patient = await User.findById(req.user.id);
+      const doctor = appointment.doctorId;
+      
+      const message = `Hello ${patient.name},\n\nYou have successfully cancelled your pending appointment with Dr. ${doctor.name} on ${appointment.date} at ${appointment.timeSlot}.\n\nThank you,\nMediCare Plus Team`;
+      
+      sendEmail({
+        email: patient.email,
+        subject: 'Appointment Cancelled - MediCare Plus',
+        message,
+      }).catch(err => console.error('Email sending failed (Render block):', err));
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+    }
+
+    res.status(200).json({ message: 'Appointment cancelled successfully', appointment });
+  } catch (error) {
+    next(error);
+  }
+};
