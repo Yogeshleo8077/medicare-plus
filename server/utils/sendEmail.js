@@ -1,4 +1,8 @@
 import nodemailer from 'nodemailer';
+import dns from 'dns';
+
+// Force IPv4 for Nodemailer to fix ETIMEDOUT on Render
+dns.setDefaultResultOrder('ipv4first');
 
 const sendEmail = async (options) => {
   // Create a transporter
