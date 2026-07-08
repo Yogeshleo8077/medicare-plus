@@ -81,14 +81,14 @@ const DoctorDetail = () => {
   });
 
   return (
-    <div className="bg-medical-light min-h-screen py-12">
+    <div className="bg-medical-light dark:bg-slate-900 transition-colors duration-300 min-h-screen py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+        <div className="bg-white dark:bg-slate-800 shadow-xl rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-700">
           <div className="md:flex">
             {/* Doctor Info */}
-            <div className="md:w-1/2 p-6 md:p-12 border-b md:border-b-0 md:border-r border-gray-100">
+            <div className="md:w-1/2 p-6 md:p-12 border-b md:border-b-0 md:border-r border-gray-100 dark:border-slate-700">
               <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                <div className="h-32 w-32 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden mb-6">
+                <div className="h-32 w-32 rounded-full bg-gray-200 dark:bg-slate-700 border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden mb-6">
                    {doctor.profileImage ? (
                       <img src={doctor.profileImage} alt={doctor.name} className="h-full w-full object-cover" />
                     ) : (
@@ -97,37 +97,37 @@ const DoctorDetail = () => {
                       </div>
                     )}
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{doctor.name}</h1>
-                <p className="text-medical-teal font-semibold text-lg mb-6">{doctor.department}</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{doctor.name}</h1>
+                <p className="text-medical-teal dark:text-teal-400 font-semibold text-lg mb-6">{doctor.department}</p>
                 
                 <div className="space-y-4 w-full">
-                  <div className="flex items-start text-gray-600">
-                    <Award className="w-5 h-5 mr-3 text-medical-blue shrink-0 mt-0.5" />
-                    <span><strong className="block text-gray-900">Qualification</strong> {doctor.qualification}</span>
+                  <div className="flex items-start text-gray-600 dark:text-gray-300">
+                    <Award className="w-5 h-5 mr-3 text-medical-blue dark:text-teal-400 shrink-0 mt-0.5" />
+                    <span><strong className="block text-gray-900 dark:text-white">Qualification</strong> {doctor.qualification}</span>
                   </div>
-                  <div className="flex items-start text-gray-600">
-                    <Clock className="w-5 h-5 mr-3 text-medical-blue shrink-0 mt-0.5" />
-                    <span><strong className="block text-gray-900">Experience</strong> {doctor.experience}</span>
+                  <div className="flex items-start text-gray-600 dark:text-gray-300">
+                    <Clock className="w-5 h-5 mr-3 text-medical-blue dark:text-teal-400 shrink-0 mt-0.5" />
+                    <span><strong className="block text-gray-900 dark:text-white">Experience</strong> {doctor.experience}</span>
                   </div>
-                  <div className="flex items-start text-gray-600">
-                    <Calendar className="w-5 h-5 mr-3 text-medical-blue shrink-0 mt-0.5" />
-                    <span><strong className="block text-gray-900">Available Days</strong> {doctor.availableDays?.join(', ')}</span>
+                  <div className="flex items-start text-gray-600 dark:text-gray-300">
+                    <Calendar className="w-5 h-5 mr-3 text-medical-blue dark:text-teal-400 shrink-0 mt-0.5" />
+                    <span><strong className="block text-gray-900 dark:text-white">Available Days</strong> {doctor.availableDays?.join(', ')}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Booking Form */}
-            <div className="md:w-1/2 p-6 md:p-12 bg-gray-50">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Appointment</h2>
+            <div className="md:w-1/2 p-6 md:p-12 bg-gray-50 dark:bg-slate-900/50">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Book Appointment</h2>
               
               <form onSubmit={handleBooking} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Date</label>
                   <select 
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-medical-blue focus:border-medical-blue sm:text-sm rounded-lg border bg-white"
+                    className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 dark:border-slate-700 focus:outline-none focus:ring-medical-blue focus:border-medical-blue sm:text-sm rounded-lg border bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                     required
                   >
                     <option value="" disabled>Choose a date...</option>
@@ -138,7 +138,7 @@ const DoctorDetail = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Time Slot</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Time Slot</label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {timeSlots.map(time => (
                       <button
@@ -148,7 +148,7 @@ const DoctorDetail = () => {
                         className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
                           selectedTimeSlot === time 
                             ? 'bg-medical-blue border-medical-blue text-white shadow-md' 
-                            : 'bg-white border-gray-300 text-gray-700 hover:border-medical-blue hover:text-medical-blue'
+                            : 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-medical-blue dark:hover:border-teal-400 hover:text-medical-blue dark:hover:text-teal-400'
                         }`}
                       >
                         {time}
