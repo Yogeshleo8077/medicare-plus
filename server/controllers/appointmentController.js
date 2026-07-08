@@ -43,11 +43,11 @@ export const bookAppointment = async (req, res, next) => {
       const patient = await User.findById(patientId);
       const message = `Hello ${patient.name},\n\nYour appointment request with Dr. ${doctor.name} on ${date} at ${timeSlot} has been received and is pending admin approval.\n\nThank you,\nMediCare Plus Team`;
       
-      await sendEmail({
+      sendEmail({
         email: patient.email,
         subject: 'Appointment Request Received - MediCare Plus',
         message,
-      });
+      }).catch(err => console.error('Email sending failed (Render block):', err));
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
       // We don't fail the appointment creation if email fails
@@ -132,11 +132,11 @@ export const updateAppointmentStatus = async (req, res, next) => {
       }
 
       if (message) {
-        await sendEmail({
+        sendEmail({
           email: patient.email,
           subject,
           message,
-        });
+        }).catch(err => console.error('Email sending failed (Render block):', err));
       }
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
