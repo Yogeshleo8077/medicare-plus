@@ -1,6 +1,7 @@
 import Appointment from '../models/Appointment.js';
 import Doctor from '../models/Doctor.js';
 import User from '../models/User.js';
+import sendEmail from '../utils/sendEmail.js';
 
 // @desc    Book an appointment
 // @route   POST /api/appointments
@@ -36,6 +37,21 @@ export const bookAppointment = async (req, res, next) => {
       timeSlot,
       status: 'pending',
     });
+
+    // Send Email Notification to Patient
+    try {
+      const patient = await User.findById(patientId);
+      const message = `Hello ${patient.name},\n\nYour appointment request with Dr. ${doctor.name} on ${date} at ${timeSlot} has been received and is pending admin approval.\n\nThank you,\nMediCare Plus Team`;
+      
+      await sendEmail({
+        email: patient.email,
+        subject: 'Appointment Request Received - MediCare Plus',
+        message,
+      });
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+      // We don't fail the appointment creation if email fails
+    }
 
     res.status(201).json(appointment);
   } catch (error) {
@@ -89,7 +105,9 @@ export const updateAppointmentStatus = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid status' });
     }
 
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findById(req.params.id)
+      .populate('patientId')
+      .populate('doctorId');
 
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
@@ -97,6 +115,32 @@ export const updateAppointmentStatus = async (req, res, next) => {
 
     appointment.status = status;
     await appointment.save();
+
+    // Send Email Notification on Status Change
+    try {
+      const patient = appointment.patientId;
+      const doctor = appointment.doctorId;
+      let message = '';
+      let subject = '';
+
+      if (status === 'approved') {
+        subject = 'Appointment Approved - MediCare Plus';
+        message = `Hello ${patient.name},\n\nGreat news! Your appointment with Dr. ${doctor.name} on ${appointment.date} at ${appointment.timeSlot} is confirmed.\n\nPlease arrive 10 minutes early.\n\nThank you,\nMediCare Plus Team`;
+      } else if (status === 'cancelled') {
+        subject = 'Appointment Cancelled - MediCare Plus';
+        message = `Hello ${patient.name},\n\nWe regret to inform you that your appointment with Dr. ${doctor.name} on ${appointment.date} at ${appointment.timeSlot} has been cancelled.\n\nPlease log in to book another slot or contact support.\n\nThank you,\nMediCare Plus Team`;
+      }
+
+      if (message) {
+        await sendEmail({
+          email: patient.email,
+          subject,
+          message,
+        });
+      }
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+    }
 
     res.status(200).json(appointment);
   } catch (error) {

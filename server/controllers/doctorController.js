@@ -45,7 +45,11 @@ export const getDoctorById = async (req, res, next) => {
 // @access  Private/Admin
 export const createDoctor = async (req, res, next) => {
   try {
-    const doctor = await Doctor.create(req.body);
+    const doctorData = { ...req.body };
+    if (req.file) {
+      doctorData.profileImage = req.file.path;
+    }
+    const doctor = await Doctor.create(doctorData);
     res.status(201).json(doctor);
   } catch (error) {
     next(error);
@@ -63,7 +67,12 @@ export const updateDoctor = async (req, res, next) => {
       return res.status(404).json({ message: 'Doctor not found' });
     }
 
-    doctor = await Doctor.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.profileImage = req.file.path;
+    }
+
+    doctor = await Doctor.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });

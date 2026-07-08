@@ -1,16 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-medical-blue: #0A66C2;
-  --color-medical-teal: #14A098;
-  --color-medical-light: #F0F4F8;
-  --color-medical-dark: #1F2937;
+  --color-medical-blue: #2563EB;
+  --color-medical-teal: #0D9488;
+  --color-medical-light: #F8FAFC;
+  --color-medical-dark: #0F172A;
   
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Outfit', system-ui, sans-serif;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   body {
-    @apply bg-medical-light text-medical-dark font-sans;
+    @apply bg-medical-light text-medical-dark font-sans antialiased transition-colors duration-300;
+  }
+  
+  /* When dark mode is active, swap the background and text globally */
+  .dark body {
+    @apply bg-slate-900 text-slate-100;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-lg border border-white/20 dark:border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+  }
+  .glass-card {
+    @apply bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-gray-100 dark:border-slate-700 shadow-xl hover:shadow-2xl transition-all duration-300;
+  }
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-medical-blue to-medical-teal;
+  }
+  
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - 1rem)); } /* 1rem is half of gap-8 (2rem) because gap applies between all elements */
   }
 }

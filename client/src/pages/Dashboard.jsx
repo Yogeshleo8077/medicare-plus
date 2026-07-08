@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
+import { User, Mail, Phone, Calendar, Clock, LogOut, CheckCircle, Clock3, XCircle } from 'lucide-react';
 import api from '../services/api';
 
 const Dashboard = () => {
@@ -49,91 +50,184 @@ const Dashboard = () => {
   if (isLoading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Patient Dashboard</h1>
-          <button onClick={logout} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Logout</button>
+    <div className="bg-medical-light dark:bg-slate-900 min-h-[calc(100vh-4rem)] py-8 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Patient Dashboard</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your health profile and appointments</p>
+          </div>
+          <button 
+            onClick={logout} 
+            className="flex items-center px-5 py-2.5 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors font-bold shadow-sm"
+          >
+            <LogOut className="w-4 h-4 mr-2" /> Logout
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Profile Section */}
-          <div className="bg-white p-6 rounded-lg shadow col-span-1 h-fit">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">My Profile</h2>
-              <button onClick={() => setIsEditing(!isEditing)} className="text-medical-blue text-sm hover:underline">
-                {isEditing ? 'Cancel' : 'Edit'}
-              </button>
-            </div>
-            
-            {isEditing ? (
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-600">Name</label>
-                  <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="w-full p-2 border rounded mt-1" required />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600">Phone</label>
-                  <input type="text" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} className="w-full p-2 border rounded mt-1" required />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600">Email (Cannot be changed)</label>
-                  <input type="text" value={profile.email} disabled className="w-full p-2 border rounded mt-1 bg-gray-100 text-gray-500" />
-                </div>
-                <button type="submit" className="w-full bg-medical-blue text-white py-2 rounded hover:bg-medical-teal">Save Changes</button>
-              </form>
-            ) : (
-              <div className="space-y-3">
-                <p><span className="text-gray-500 text-sm block">Name</span><span className="font-medium text-gray-900">{profile.name}</span></p>
-                <p><span className="text-gray-500 text-sm block">Email</span><span className="font-medium text-gray-900">{profile.email}</span></p>
-                <p><span className="text-gray-500 text-sm block">Phone</span><span className="font-medium text-gray-900">{profile.phone}</span></p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Profile Section (Sidebar) */}
+          <div className="lg:col-span-1">
+            <div className="glass-card p-6 md:p-8 rounded-[2rem] sticky top-24">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                  <User className="w-5 h-5 mr-2 text-medical-blue dark:text-teal-400" /> My Profile
+                </h2>
+                <button 
+                  onClick={() => setIsEditing(!isEditing)} 
+                  className="text-sm font-semibold text-medical-blue dark:text-teal-400 hover:text-medical-teal transition-colors px-3 py-1 rounded-full bg-blue-50 dark:bg-slate-700"
+                >
+                  {isEditing ? 'Cancel' : 'Edit Profile'}
+                </button>
               </div>
-            )}
+              
+              <div className="flex flex-col items-center mb-8">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-medical-blue to-medical-teal text-white flex items-center justify-center font-bold text-4xl shadow-lg mb-4">
+                  {profile.name ? profile.name.charAt(0).toUpperCase() : 'P'}
+                </div>
+                {!isEditing && <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">{profile.name}</h3>}
+              </div>
+
+              {isEditing ? (
+                <form onSubmit={handleProfileUpdate} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-medical-blue outline-none transition-all" required />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input type="text" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} className="w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-medical-blue outline-none transition-all" required />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                    <div className="relative opacity-60 cursor-not-allowed">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input type="text" value={profile.email} disabled className="w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-500 cursor-not-allowed" />
+                    </div>
+                  </div>
+                  <button type="submit" className="w-full bg-gradient-to-r from-medical-blue to-medical-teal text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                    Save Changes
+                  </button>
+                </form>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
+                    <Mail className="w-5 h-5 text-medical-blue dark:text-teal-400 mr-3" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Email Address</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{profile.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
+                    <Phone className="w-5 h-5 text-medical-blue dark:text-teal-400 mr-3" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Phone Number</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{profile.phone}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Appointments Section */}
-          <div className="md:col-span-2 space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* Upcoming Appointments */}
+            <div className="glass-card p-6 md:p-8 rounded-[2rem]">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center mb-6">
+                <Calendar className="w-5 h-5 mr-2 text-medical-blue dark:text-teal-400" /> Upcoming Appointments
+              </h2>
+              
               {upcomingAppts.length === 0 ? (
-                <p className="text-gray-500">No upcoming appointments.</p>
+                <div className="text-center py-10 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700">
+                  <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">No upcoming appointments scheduled.</p>
+                </div>
               ) : (
-                <ul className="divide-y divide-gray-200">
+                <div className="grid gap-4">
                   {upcomingAppts.map(appt => (
-                    <li key={appt._id} className="py-4 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-medical-dark">Dr. {appt.doctorId?.name}</p>
-                        <p className="text-sm text-gray-500">{appt.date} at {appt.timeSlot}</p>
+                    <div key={appt._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group">
+                      <div className="flex items-start mb-4 sm:mb-0">
+                        <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-slate-700 flex items-center justify-center text-medical-blue dark:text-teal-400 font-bold mr-4 shrink-0 group-hover:scale-110 transition-transform">
+                          {appt.doctorId?.name?.charAt(0) || 'D'}
+                        </div>
+                        <div>
+                          <p className="font-bold text-lg text-gray-900 dark:text-white">Dr. {appt.doctorId?.name}</p>
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            <Calendar className="w-4 h-4 mr-1" /> {appt.date}
+                            <span className="mx-2">•</span>
+                            <Clock className="w-4 h-4 mr-1" /> {appt.timeSlot}
+                          </div>
+                        </div>
                       </div>
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${appt.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {appt.status}
-                      </span>
-                    </li>
+                      <div className="w-full sm:w-auto flex justify-end">
+                        {appt.status === 'approved' ? (
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            <CheckCircle className="w-4 h-4 mr-1" /> Approved
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                            <Clock3 className="w-4 h-4 mr-1" /> Pending
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4">Appointment History</h2>
+            {/* Appointment History */}
+            <div className="glass-card p-6 md:p-8 rounded-[2rem]">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center mb-6">
+                <Clock className="w-5 h-5 mr-2 text-gray-400" /> Appointment History
+              </h2>
+              
               {pastAppts.length === 0 ? (
-                <p className="text-gray-500">No past appointments.</p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400">No past appointments found.</p>
+                </div>
               ) : (
-                <ul className="divide-y divide-gray-200">
+                <div className="grid gap-3">
                   {pastAppts.map(appt => (
-                    <li key={appt._id} className="py-4 flex justify-between items-center">
+                    <div key={appt._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700">
                       <div>
-                        <p className="font-medium text-gray-900">Dr. {appt.doctorId?.name}</p>
-                        <p className="text-sm text-gray-500">{appt.date} at {appt.timeSlot}</p>
+                        <p className="font-bold text-gray-700 dark:text-gray-300">Dr. {appt.doctorId?.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{appt.date} at {appt.timeSlot}</p>
                       </div>
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${appt.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {appt.status}
-                      </span>
-                    </li>
+                      <div className="mt-2 sm:mt-0">
+                        {appt.status === 'cancelled' ? (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-900/30">
+                            <XCircle className="w-3 h-3 mr-1" /> Cancelled
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-slate-700 dark:text-gray-300">
+                            Completed
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
+
           </div>
         </div>
       </div>

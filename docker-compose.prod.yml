@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: medicare-mongodb-prod
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_prod:/data/db
+    restart: unless-stopped
+
+  server:
+    image: ghcr.io/yogeshleo8077/medicare-plus-server:latest
+    container_name: medicare-server-prod
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/medicare-plus
+      - JWT_SECRET=super_secret_jwt_key_change_in_production
+      - PORT=5000
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  client:
+    image: ghcr.io/yogeshleo8077/medicare-plus-client:latest
+    container_name: medicare-client-prod
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  mongodb_data_prod:
