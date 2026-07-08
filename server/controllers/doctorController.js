@@ -1,4 +1,5 @@
 import Doctor from '../models/Doctor.js';
+import Appointment from '../models/Appointment.js';
 
 // @desc    Get all doctors
 // @route   GET /api/doctors
@@ -101,3 +102,29 @@ export const deleteDoctor = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get booked slots for a specific doctor on a specific date
+// @route   GET /api/doctors/:id/booked-slots
+// @access  Public
+export const getDoctorBookedSlots = async (req, res, next) => {
+  try {
+    const { date } = req.query;
+    
+    if (!date) {
+      return res.status(400).json({ message: 'Date query parameter is required' });
+    }
+
+    const appointments = await Appointment.find({
+      doctorId: req.params.id,
+      date: date,
+      status: { $ne: 'cancelled' } // pending, approved, completed
+    }).select('timeSlot');
+
+    const bookedSlots = appointments.map(appt => appt.timeSlot);
+    
+    res.status(200).json(bookedSlots);
+  } catch (error) {
+    next(error);
+  }
+};
+

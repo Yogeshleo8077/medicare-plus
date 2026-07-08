@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { User, Mail, Phone, Calendar, Clock, LogOut, CheckCircle, Clock3, XCircle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Clock, LogOut, CheckCircle, Clock3, XCircle, AlertTriangle } from 'lucide-react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [profile, setProfile] = useState({ name: '', phone: '', email: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [cancelModalData, setCancelModalData] = useState({ isOpen: false, appointmentId: null });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,8 +47,12 @@ const Dashboard = () => {
     }
   };
 
-  const handleCancelAppointment = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
+  const openCancelModal = (id) => setCancelModalData({ isOpen: true, appointmentId: id });
+  const closeCancelModal = () => setCancelModalData({ isOpen: false, appointmentId: null });
+
+  const confirmCancel = async () => {
+    const id = cancelModalData.appointmentId;
+    if (!id) return;
     
     try {
       await api.patch(`/appointments/${id}/cancel`);
@@ -55,8 +60,10 @@ const Dashboard = () => {
       setAppointments(appointments.map(a => 
         a._id === id ? { ...a, status: 'cancelled' } : a
       ));
+      closeCancelModal();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to cancel appointment');
+      closeCancelModal();
     }
   };
 
@@ -203,7 +210,7 @@ const Dashboard = () => {
                               <Clock3 className="w-4 h-4 mr-1" /> Pending
                             </span>
                             <button
-                              onClick={() => handleCancelAppointment(appt._id)}
+                              onClick={() => openCancelModal(appt._id)}
                               className="inline-flex items-center p-1.5 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-lg transition-colors"
                               title="Cancel Appointment"
                             >
@@ -256,6 +263,37 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {cancelModalData.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-slate-700">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-5 rounded-full bg-red-50 dark:bg-red-900/20">
+                <AlertTriangle className="w-8 h-8 text-red-500 dark:text-red-400" />
+              </div>
+              <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">Cancel Appointment?</h3>
+              <p className="text-center text-gray-500 dark:text-gray-400 mb-8 text-sm">
+                Are you sure you want to cancel this appointment? This action cannot be undone.
+              </p>
+              <div className="flex flex-col space-y-3">
+                <button
+                  onClick={confirmCancel}
+                  className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-sm shadow-red-500/20 transition-colors"
+                >
+                  Yes, Cancel Appointment
+                </button>
+                <button
+                  onClick={closeCancelModal}
+                  className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-300 font-bold rounded-xl transition-colors"
+                >
+                  No, Keep it
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

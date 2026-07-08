@@ -17,6 +17,7 @@ const DoctorDetail = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
   const [isBooking, setIsBooking] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState([]);
 
   // Mock available times since PRD simplified it to a string for schema, we'll split it or mock it
   const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
@@ -35,6 +36,23 @@ const DoctorDetail = () => {
     };
     fetchDoctor();
   }, [id, navigate]);
+
+  useEffect(() => {
+    if (selectedDate && id) {
+      const fetchBookedSlots = async () => {
+        try {
+          const res = await api.get(`/doctors/${id}/booked-slots?date=${selectedDate}`);
+          setBookedSlots(res.data);
+          setSelectedTimeSlot((prev) => res.data.includes(prev) ? '' : prev);
+        } catch (error) {
+          console.error("Failed to fetch booked slots", error);
+        }
+      };
+      fetchBookedSlots();
+    } else {
+      setBookedSlots([]);
+    }
+  }, [selectedDate, id]);
 
   const handleBooking = async (e) => {
     e.preventDefault();
@@ -140,20 +158,25 @@ const DoctorDetail = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Time Slot</label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {timeSlots.map(time => (
+                    {timeSlots.map(time => {
+                      const isBooked = bookedSlots.includes(time);
+                      return (
                       <button
                         key={time}
                         type="button"
+                        disabled={isBooked}
                         onClick={() => setSelectedTimeSlot(time)}
                         className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
-                          selectedTimeSlot === time 
-                            ? 'bg-medical-blue border-medical-blue text-white shadow-md' 
-                            : 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-medical-blue dark:hover:border-teal-400 hover:text-medical-blue dark:hover:text-teal-400'
+                          isBooked
+                            ? 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60'
+                            : selectedTimeSlot === time 
+                              ? 'bg-medical-blue border-medical-blue text-white shadow-md' 
+                              : 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-medical-blue dark:hover:border-teal-400 hover:text-medical-blue dark:hover:text-teal-400'
                         }`}
                       >
-                        {time}
+                        {time} {isBooked && <span className="text-[10px] block font-normal leading-none mt-1">Booked</span>}
                       </button>
-                    ))}
+                    )})}
                   </div>
                 </div>
 

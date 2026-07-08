@@ -2,6 +2,7 @@ import Appointment from '../models/Appointment.js';
 import Doctor from '../models/Doctor.js';
 import User from '../models/User.js';
 import sendEmail from '../utils/sendEmail.js';
+import sendWhatsappMessage from '../utils/sendWhatsapp.js';
 
 // @desc    Book an appointment
 // @route   POST /api/appointments
@@ -48,6 +49,13 @@ export const bookAppointment = async (req, res, next) => {
         subject: 'Appointment Request Received - MediCare Plus',
         message,
       }).catch(err => console.error('Email sending failed (Render block):', err));
+
+      if (patient.phone) {
+        sendWhatsappMessage({
+          phone: patient.phone,
+          message: `*Appointment Request Received*\n\n` + message,
+        }).catch(err => console.error('WhatsApp sending failed:', err));
+      }
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
       // We don't fail the appointment creation if email fails
@@ -137,6 +145,13 @@ export const updateAppointmentStatus = async (req, res, next) => {
           subject,
           message,
         }).catch(err => console.error('Email sending failed (Render block):', err));
+
+        if (patient.phone) {
+          sendWhatsappMessage({
+            phone: patient.phone,
+            message: `*${subject}*\n\n${message}`,
+          }).catch(err => console.error('WhatsApp sending failed:', err));
+        }
       }
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
@@ -185,6 +200,13 @@ export const cancelPatientAppointment = async (req, res, next) => {
         subject: 'Appointment Cancelled - MediCare Plus',
         message,
       }).catch(err => console.error('Email sending failed (Render block):', err));
+
+      if (patient.phone) {
+        sendWhatsappMessage({
+          phone: patient.phone,
+          message: `*Appointment Cancelled*\n\n${message}`,
+        }).catch(err => console.error('WhatsApp sending failed:', err));
+      }
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
     }

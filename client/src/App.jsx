@@ -12,6 +12,7 @@ import DoctorDetail from "./pages/DoctorDetail";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import Chatbot from "./components/Chatbot";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           </main>
           <Footer />
         </div>
+        <Chatbot />
         <Toaster position="top-right" />
       </Router>
     </AuthProvider>
