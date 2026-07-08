@@ -10,6 +10,7 @@ const sendEmail = async (options) => {
     host: 'smtp.gmail.com',
     port: 587,
     secure: false, // true for 465, false for other ports
+    family: 4, // Force IPv4 to prevent Render IPv6 ENETUNREACH error
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
