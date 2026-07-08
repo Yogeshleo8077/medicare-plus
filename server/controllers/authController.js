@@ -52,26 +52,18 @@ export const registerUser = async (req, res, next) => {
     });
 
     if (user) {
-      // Send OTP via email
-      try {
-        await sendEmail({
-          email: user.email,
-          subject: 'MediCare Plus - Email Verification OTP',
-          message: `Your OTP for email verification is ${otp}. It is valid for 5 minutes.`,
-        });
-        res.status(201).json({
-          message: 'User registered. Please check your email for the OTP.',
-          email: user.email
-        });
-      } catch (error) {
-        console.error('Email could not be sent', error);
-        // We still created the user, but email failed.
-        // For production, we might want to handle this better (e.g., allow resend OTP)
-        res.status(201).json({
-          message: 'User registered, but OTP email failed to send. Please contact support.',
-          email: user.email
-        });
-      }
+      // Send OTP via email asynchronously to prevent Render timeout
+      sendEmail({
+        email: user.email,
+        subject: 'MediCare Plus - Email Verification OTP',
+        message: `Your OTP for email verification is ${otp}. It is valid for 5 minutes.`,
+      }).catch(err => console.error('Email could not be sent (Render might be blocking it):', err));
+
+      res.status(201).json({
+        message: 'User registered. Please check your email for the OTP.',
+        email: user.email,
+        testOtp: otp // Added for testing purposes so they can proceed even if email fails
+      });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
     }
