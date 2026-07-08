@@ -1,36 +1,36 @@
-import nodemailer from 'nodemailer';
-import dns from 'dns';
-
-// Force IPv4 for Nodemailer to fix ETIMEDOUT on Render
-dns.setDefaultResultOrder('ipv4first');
-
 const sendEmail = async (options) => {
-  // Create a transporter
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    family: 4, // Force IPv4 to prevent Render IPv6 ENETUNREACH error
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': process.env.BREVO_API_KEY,
+        'Content-Type': 'application/json',
+        'accept': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { 
+          name: 'MediCare Plus', 
+          email: process.env.EMAIL_USER 
+        },
+        to: [
+          { email: options.email }
+        ],
+        subject: options.subject,
+        htmlContent: `<p style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">${options.message.replace(/\n/g, '<br>')}</p>`
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Brevo API Error:', errorData);
+      throw new Error(`Email failed: ${errorData}`);
     }
-  });
 
-  // Define the email options
-  const mailOptions = {
-    from: `MediCare Plus <${process.env.EMAIL_USER}>`,
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-    // html: options.html // Optional: if we want HTML emails
-  };
-
-  // Send the email
-  await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully via Brevo HTTP API');
+  } catch (error) {
+    console.error('sendEmail Error:', error);
+    throw error;
+  }
 };
 
 export default sendEmail;
