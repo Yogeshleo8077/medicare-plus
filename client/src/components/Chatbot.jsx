@@ -61,7 +61,7 @@ const Chatbot = () => {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-r from-medical-blue to-medical-teal text-white shadow-2xl hover:shadow-medical-blue/30 hover:-translate-y-1 transition-all duration-300 z-50 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+        className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 p-3.5 sm:p-4 rounded-full bg-gradient-to-r from-medical-blue to-medical-teal text-white shadow-2xl hover:shadow-medical-blue/30 hover:-translate-y-1 transition-all duration-300 z-50 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
       >
         <MessageSquare className="w-7 h-7" />
         <span className="absolute -top-1 -right-1 flex h-4 w-4">
@@ -72,7 +72,7 @@ const Chatbot = () => {
 
       {/* Chat Window */}
       <div
-        className={`fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-medical-blue/20 dark:shadow-black/50 border border-gray-100 dark:border-slate-700 flex flex-col overflow-hidden z-50 transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}
+        className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-32px)] sm:w-[400px] h-[500px] max-h-[80vh] bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl shadow-medical-blue/20 dark:shadow-black/50 border border-gray-100 dark:border-slate-700 flex flex-col overflow-hidden z-50 transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}
       >
         {/* Header */}
         <div className="px-6 py-4 bg-gradient-to-r from-medical-blue to-medical-teal text-white flex justify-between items-center shadow-md">
