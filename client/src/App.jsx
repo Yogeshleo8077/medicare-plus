@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Doctors from "./pages/Doctors";
 import DoctorDetail from "./pages/DoctorDetail";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -38,7 +39,7 @@ function App() {
               />
             </Routes>
           </main>
-          {/* <Footer /> */}
+          <Footer />
         </div>
         <ToastContainer position="top-right" autoClose={3000} />
       </Router>

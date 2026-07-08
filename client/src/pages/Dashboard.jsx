@@ -4,9 +4,10 @@ import { toast } from 'react-toastify';
 import api from '../services/api';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const [appointments, setAppointments] = useState([]);
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState({ name: '', phone: '', email: '' });
+  const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,21 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.put('/patients/me', { name: profile.name, phone: profile.phone });
+      toast.success('Profile updated successfully');
+      setProfile(res.data);
+      setIsEditing(false);
+      
+      // Update local storage user context
+      login({ ...user, name: res.data.name });
+    } catch (error) {
+      toast.error('Failed to update profile');
+    }
+  };
+
   const upcomingAppts = appointments.filter(a => ['pending', 'approved'].includes(a.status) && new Date(a.date) >= new Date(new Date().setHours(0,0,0,0)));
   const pastAppts = appointments.filter(a => ['completed', 'cancelled'].includes(a.status) || new Date(a.date) < new Date(new Date().setHours(0,0,0,0)));
 
@@ -42,13 +58,37 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Profile Section */}
-          <div className="bg-white p-6 rounded-lg shadow col-span-1">
-            <h2 className="text-xl font-semibold mb-4">My Profile</h2>
-            <div className="space-y-2">
-              <p><strong>Name:</strong> {profile.name}</p>
-              <p><strong>Email:</strong> {profile.email}</p>
-              <p><strong>Phone:</strong> {profile.phone}</p>
+          <div className="bg-white p-6 rounded-lg shadow col-span-1 h-fit">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">My Profile</h2>
+              <button onClick={() => setIsEditing(!isEditing)} className="text-medical-blue text-sm hover:underline">
+                {isEditing ? 'Cancel' : 'Edit'}
+              </button>
             </div>
+            
+            {isEditing ? (
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-600">Name</label>
+                  <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="w-full p-2 border rounded mt-1" required />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600">Phone</label>
+                  <input type="text" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} className="w-full p-2 border rounded mt-1" required />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600">Email (Cannot be changed)</label>
+                  <input type="text" value={profile.email} disabled className="w-full p-2 border rounded mt-1 bg-gray-100 text-gray-500" />
+                </div>
+                <button type="submit" className="w-full bg-medical-blue text-white py-2 rounded hover:bg-medical-teal">Save Changes</button>
+              </form>
+            ) : (
+              <div className="space-y-3">
+                <p><span className="text-gray-500 text-sm block">Name</span><span className="font-medium text-gray-900">{profile.name}</span></p>
+                <p><span className="text-gray-500 text-sm block">Email</span><span className="font-medium text-gray-900">{profile.email}</span></p>
+                <p><span className="text-gray-500 text-sm block">Phone</span><span className="font-medium text-gray-900">{profile.phone}</span></p>
+              </div>
+            )}
           </div>
 
           {/* Appointments Section */}
