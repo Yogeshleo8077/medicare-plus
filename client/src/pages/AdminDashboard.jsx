@@ -3,9 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Users, Stethoscope, CalendarCheck, Edit, Trash2, CheckCircle, XCircle, LogOut, LayoutDashboard, Plus, Mail, Phone, Clock, Calendar, Search } from 'lucide-react';
 import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'doctors', 'patients'
   
   // Dashboard Data
@@ -128,7 +130,7 @@ const AdminDashboard = () => {
             <p className="text-gray-500 dark:text-gray-400 mt-1">Manage doctors, patients, and platform statistics</p>
           </div>
           <button 
-            onClick={logout} 
+            onClick={() => { logout(); navigate('/login'); }} 
             className="flex items-center px-5 py-2.5 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors font-bold shadow-sm"
           >
             <LogOut className="w-4 h-4 mr-2" /> Logout

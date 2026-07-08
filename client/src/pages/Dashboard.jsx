@@ -3,9 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { User, Mail, Phone, Calendar, Clock, LogOut, CheckCircle, Clock3, XCircle } from 'lucide-react';
 import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [profile, setProfile] = useState({ name: '', phone: '', email: '' });
   const [isEditing, setIsEditing] = useState(false);
@@ -60,7 +62,7 @@ const Dashboard = () => {
             <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your health profile and appointments</p>
           </div>
           <button 
-            onClick={logout} 
+            onClick={() => { logout(); navigate('/login'); }} 
             className="flex items-center px-5 py-2.5 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors font-bold shadow-sm"
           >
             <LogOut className="w-4 h-4 mr-2" /> Logout
