@@ -29,12 +29,6 @@ const Register = () => {
       const response = await api.post('/auth/register', { name, email, phone, password });
       toast.success('Registration successful! Please check your email for the OTP.');
       
-      // For testing purposes: if the backend sends the OTP (e.g. if email is blocked by Render)
-      if (response.data.testOtp) {
-        console.log(`[TEST MODE] Your OTP is: ${response.data.testOtp}`);
-        toast.success(`[Test Mode] OTP is: ${response.data.testOtp}`, { duration: 6000 });
-      }
-
       navigate('/verify-otp', { state: { email } });
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to register');

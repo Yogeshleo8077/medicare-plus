@@ -61,8 +61,7 @@ export const registerUser = async (req, res, next) => {
 
       res.status(201).json({
         message: 'User registered. Please check your email for the OTP.',
-        email: user.email,
-        testOtp: otp // Added for testing purposes so they can proceed even if email fails
+        email: user.email
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
