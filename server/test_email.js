@@ -1,32 +1,16 @@
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
 
-console.log('Testing email send...');
+import sendEmail from './utils/sendEmail.js';
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+console.log('Testing Brevo API email send...');
 
-transporter.sendMail({
-  from: `"Test" <${process.env.EMAIL_USER}>`,
-  to: process.env.EMAIL_USER,
-  subject: "Test from local",
-  text: "Hello this is a test"
-}).then(info => {
-  console.log('Success:', info.messageId);
+sendEmail({
+  email: process.env.EMAIL_USER,
+  subject: "Test from Brevo API",
+  message: "Hello this is a test from the new HTTP API system"
+}).then(() => {
+  console.log('Success: Email sent!');
 }).catch(err => {
   console.error('Failed:', err);
 });

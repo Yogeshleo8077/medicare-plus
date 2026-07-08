@@ -12,6 +12,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    setIsOpen(false);
     navigate('/login');
   };
 
@@ -89,11 +90,11 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden glass border-t border-gray-100 dark:border-slate-800">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-inner">
-            <Link to="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Home</Link>
-            <Link to="/doctors" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Find Doctors</Link>
+            <Link onClick={() => setIsOpen(false)} to="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Home</Link>
+            <Link onClick={() => setIsOpen(false)} to="/doctors" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Find Doctors</Link>
             
             <button 
-              onClick={toggleTheme} 
+              onClick={() => { toggleTheme(); setIsOpen(false); }} 
               className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-800"
             >
               {isDarkMode ? <><Sun className="w-5 h-5 mr-3 text-yellow-400" /> Light Mode</> : <><Moon className="w-5 h-5 mr-3" /> Dark Mode</>}
@@ -101,13 +102,13 @@ const Navbar = () => {
 
             {user ? (
               <>
-                <Link to={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Dashboard</Link>
+                <Link onClick={() => setIsOpen(false)} to={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Dashboard</Link>
                 <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">Logout</button>
               </>
             ) : (
               <>
-                <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Log In</Link>
-                <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-medical-blue hover:bg-blue-50 dark:hover:bg-slate-800">Sign Up</Link>
+                <Link onClick={() => setIsOpen(false)} to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-medical-blue hover:bg-gray-50 dark:hover:bg-slate-800">Log In</Link>
+                <Link onClick={() => setIsOpen(false)} to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-medical-blue hover:bg-blue-50 dark:hover:bg-slate-800">Sign Up</Link>
               </>
             )}
           </div>

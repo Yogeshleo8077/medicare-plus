@@ -33,7 +33,7 @@ const Home = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left flex flex-col md:flex-row items-center py-24 md:py-32 relative z-10">
           <div className="md:w-1/2 space-y-8">
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
               Your Health, <br/> 
               <span className="gradient-text bg-gradient-to-r from-teal-300 to-blue-400">Our Priority</span>
             </h1>
