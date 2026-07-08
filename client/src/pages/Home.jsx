@@ -188,7 +188,7 @@ const Home = () => {
                 { name: "Emily Rodriguez", text: "The facilities are top-notch and the staff really cares. Highly recommend MediCare Plus to anyone." },
                 { name: "David Wilson", text: "Best medical care I've ever received. The doctors are very professional and empathetic." },
               ].map((review, i) => (
-                <div key={i} className="glass-card p-8 rounded-[2rem] w-80 md:w-[400px] shrink-0">
+                <div key={i} className="glass-card p-6 sm:p-8 rounded-[2rem] w-72 md:w-[400px] shrink-0">
                   <div className="flex space-x-1 text-yellow-400 mb-6">
                     <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
                   </div>

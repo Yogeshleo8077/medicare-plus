@@ -86,7 +86,7 @@ const DoctorDetail = () => {
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
           <div className="md:flex">
             {/* Doctor Info */}
-            <div className="md:w-1/2 p-8 md:p-12 border-b md:border-b-0 md:border-r border-gray-100">
+            <div className="md:w-1/2 p-6 md:p-12 border-b md:border-b-0 md:border-r border-gray-100">
               <div className="flex flex-col items-center md:items-start text-center md:text-left">
                 <div className="h-32 w-32 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden mb-6">
                    {doctor.profileImage ? (
@@ -118,7 +118,7 @@ const DoctorDetail = () => {
             </div>
 
             {/* Booking Form */}
-            <div className="md:w-1/2 p-8 md:p-12 bg-gray-50">
+            <div className="md:w-1/2 p-6 md:p-12 bg-gray-50">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Appointment</h2>
               
               <form onSubmit={handleBooking} className="space-y-6">
