@@ -6,6 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    host: true, // Needed for Docker to expose the port outside the container
+    port: 5173,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
