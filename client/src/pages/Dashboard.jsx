@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { User, Mail, Phone, Calendar, Clock, LogOut, CheckCircle, Clock3, XCircle, AlertTriangle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Clock, LogOut, CheckCircle, Clock3, XCircle, AlertTriangle, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,6 +51,111 @@ const Dashboard = () => {
 
   const openCancelModal = (id) => setCancelModalData({ isOpen: true, appointmentId: id });
   const closeCancelModal = () => setCancelModalData({ isOpen: false, appointmentId: null });
+
+  const handleDownloadSlip = (appt) => {
+    try {
+      const doc = new jsPDF();
+      
+      // Colors and styling
+      const primaryColor = [37, 99, 235]; // Blue
+      const secondaryColor = [13, 148, 136]; // Teal
+      
+      // Header Section
+      doc.setFillColor(248, 250, 252); // Slate-50 background for header
+      doc.rect(0, 0, 210, 40, 'F');
+      
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('MediCare Plus', 20, 20);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Your Trusted Healthcare Partner', 20, 28);
+      
+      // Invoice Info (Right aligned)
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42); // Slate-900
+      doc.setFont('helvetica', 'bold');
+      doc.text('APPOINTMENT SLIP', 190, 20, { align: 'right' });
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Booking ID: #${appt._id.slice(-6).toUpperCase()}`, 190, 28, { align: 'right' });
+      
+      // Separator Line
+      doc.setDrawColor(226, 232, 240); // Slate-200
+      doc.line(20, 45, 190, 45);
+
+      // Section: Patient Details
+      doc.setFontSize(12);
+      doc.setTextColor(...primaryColor);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Patient Details', 20, 55);
+
+      doc.setFontSize(10);
+      doc.setTextColor(71, 85, 105);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Name: ${profile.name}`, 20, 63);
+      doc.text(`Email: ${profile.email}`, 20, 69);
+      doc.text(`Phone: ${profile.phone}`, 20, 75);
+
+      // Section: Doctor Details
+      doc.setFontSize(12);
+      doc.setTextColor(...secondaryColor);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Consultation Details', 120, 55);
+
+      doc.setFontSize(10);
+      doc.setTextColor(71, 85, 105);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Doctor: Dr. ${appt.doctorId?.name}`, 120, 63);
+      doc.text(`Specialty: ${appt.doctorId?.specialization || 'General'}`, 120, 69);
+
+      // Appointment Table
+      autoTable(doc, {
+        startY: 90,
+        head: [['Date', 'Time Slot', 'Status', 'Consultation Fee']],
+        body: [
+          [
+            appt.date, 
+            appt.timeSlot, 
+            appt.status.toUpperCase(), 
+            `Rs. ${appt.doctorId?.consultationFee || '500'}`
+          ],
+        ],
+        theme: 'grid',
+        headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: 'bold' },
+        styles: { halign: 'center', cellPadding: 6 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+      });
+
+      // Footer Notes
+      const finalY = doc.lastAutoTable.finalY || 120;
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Instructions for Patient:', 20, finalY + 15);
+      
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text([
+        '1. Please arrive at the clinic 15 minutes before your scheduled appointment time.',
+        '2. Bring this slip (digital or printed) and any past medical records.',
+        '3. If you need to cancel or reschedule, please do so from your dashboard at least 2 hours prior.'
+      ], 20, finalY + 22);
+
+      // Save PDF
+      doc.save(`Medicare_Slip_${appt.date}_${appt.doctorId?.name}.pdf`);
+      toast.success('Appointment slip downloaded successfully!');
+    } catch (error) {
+      toast.error('Failed to generate PDF slip');
+      console.error(error);
+    }
+  };
 
   const confirmCancel = async () => {
     const id = cancelModalData.appointmentId;
@@ -201,9 +308,18 @@ const Dashboard = () => {
                       </div>
                       <div className="w-full sm:w-auto flex justify-end items-center space-x-3">
                         {appt.status === 'approved' ? (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                            <CheckCircle className="w-4 h-4 mr-1" /> Approved
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                              <CheckCircle className="w-4 h-4 mr-1" /> Approved
+                            </span>
+                            <button
+                              onClick={() => handleDownloadSlip(appt)}
+                              className="inline-flex items-center px-3 py-1.5 text-sm font-bold text-white bg-medical-blue hover:bg-medical-teal rounded-lg transition-colors shadow-sm"
+                              title="Download Slip"
+                            >
+                              <Download className="w-4 h-4 mr-1" /> Slip
+                            </button>
+                          </div>
                         ) : (
                           <>
                             <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
@@ -249,9 +365,18 @@ const Dashboard = () => {
                             <XCircle className="w-3 h-3 mr-1" /> Cancelled
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-slate-700 dark:text-gray-300">
-                            Completed
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-slate-700 dark:text-gray-300">
+                              Completed
+                            </span>
+                            <button
+                              onClick={() => handleDownloadSlip(appt)}
+                              className="inline-flex items-center p-1.5 text-medical-blue hover:bg-blue-50 dark:hover:bg-slate-700 rounded-md transition-colors"
+                              title="Download Slip"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
