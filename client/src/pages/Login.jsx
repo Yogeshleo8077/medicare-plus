@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -14,6 +15,7 @@ const schema = yup.object({
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -46,52 +48,101 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-medical-light py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-medical-dark">
-            Sign in to your account
-          </h2>
+    <div className="min-h-[calc(100vh-64px)] flex bg-gradient-to-br from-medical-light to-white dark:from-slate-900 dark:to-slate-800 transition-colors duration-300 relative overflow-hidden">
+      
+      {/* Mobile background decorative blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-72 h-72 bg-medical-blue opacity-20 rounded-full blur-3xl lg:hidden pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-72 h-72 bg-medical-teal opacity-20 rounded-full blur-3xl lg:hidden pointer-events-none"></div>
+
+      {/* Left side - Graphic/Brand */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-medical-blue to-medical-teal p-12 flex-col justify-center relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-medical-dark opacity-20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/10 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/10 rounded-full"></div>
+        
+        <div className="z-10 max-w-lg">
+          <h1 className="text-5xl font-extrabold text-white mb-6 leading-tight">
+            Welcome back to <br/>MediCare Plus
+          </h1>
+          <p className="text-xl text-blue-50 leading-relaxed">
+            Your health, our priority. Securely access your medical records, book appointments, and chat with MediBot.
+          </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                {...register('email')}
-                type="email"
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-medical-blue focus:border-medical-blue focus:z-10 sm:text-sm"
-                placeholder="Email address"
-              />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                {...register('password')}
-                type="password"
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-medical-blue focus:border-medical-blue focus:z-10 sm:text-sm"
-                placeholder="Password"
-              />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-            </div>
+      </div>
+
+      {/* Right side - Form */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 dark:opacity-[0.02]"></div>
+        
+        <div className="w-full max-w-md space-y-8 bg-white/90 dark:bg-slate-800/90 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl shadow-2xl shadow-medical-blue/10 dark:shadow-black/40 border border-white/50 dark:border-slate-700/50 z-10 transition-all">
+          <div>
+            <h2 className="text-center text-3xl font-extrabold text-medical-dark dark:text-white tracking-tight">
+              Sign In
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
+              Please enter your details to continue.
+            </p>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-medical-blue hover:bg-medical-teal focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-medical-blue transition-colors duration-300 disabled:opacity-50"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <div className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                <input
+                  {...register('email')}
+                  type="email"
+                  className="appearance-none rounded-xl relative block w-full px-4 py-3.5 border border-gray-200 dark:border-slate-600 dark:bg-slate-700/50 placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue/50 focus:border-medical-blue sm:text-sm transition-all shadow-sm"
+                  placeholder="you@example.com"
+                />
+                {errors.email && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.email.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                <div className="relative">
+                  <input
+                    {...register('password')}
+                    type={showPassword ? "text" : "password"}
+                    className="appearance-none rounded-xl relative block w-full px-4 py-3.5 border border-gray-200 dark:border-slate-600 dark:bg-slate-700/50 placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue/50 focus:border-medical-blue sm:text-sm transition-all shadow-sm pr-12"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-medical-blue dark:hover:text-medical-teal transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.password.message}</p>}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end">
+              <Link to="/forgot-password" className="text-sm font-medium text-medical-blue hover:text-medical-teal transition-colors duration-300">
+                Forgot your password?
+              </Link>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-medical-blue to-medical-teal hover:from-medical-teal hover:to-medical-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-medical-blue transition-all duration-500 disabled:opacity-50 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </button>
+            </div>
+          </form>
+
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
+            Don't have an account?{' '}
+            <Link to="/register" className="font-bold text-medical-blue hover:text-medical-teal dark:text-medical-teal dark:hover:text-blue-300 transition-colors duration-300">
+              Create one now
+            </Link>
           </div>
-        </form>
-        <div className="text-center text-sm text-gray-600 mt-4">
-          Don't have an account?{' '}
-          <Link to="/register" className="font-medium text-medical-blue hover:text-medical-teal transition-colors duration-300">
-            Register here
-          </Link>
         </div>
       </div>
     </div>
