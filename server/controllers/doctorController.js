@@ -6,7 +6,7 @@ import Appointment from '../models/Appointment.js';
 // @access  Public
 export const getDoctors = async (req, res, next) => {
   try {
-    const { featured, department } = req.query;
+    const { featured, department, lat, lng } = req.query;
     let query = {};
     
     if (featured === 'true') {
@@ -15,6 +15,18 @@ export const getDoctors = async (req, res, next) => {
     
     if (department) {
       query.department = department;
+    }
+
+    if (lat && lng) {
+      query.location = {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(lng), parseFloat(lat)]
+          },
+          $maxDistance: 50000 // 50 km radius
+        }
+      };
     }
 
     const doctors = await Doctor.find(query);
